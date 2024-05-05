@@ -1,0 +1,5 @@
+#!#!/usr/bin/env bash
+# Author: Andre Rampono
+# Student: 23840638
+set -x
+# Data cleaning script to take three arguments, clean the data and send to STDOUT

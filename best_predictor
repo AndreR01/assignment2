@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Author: Andre Rampono
+# Student: 23840638
+set -x
+# Take the input from cantril_data_cleaning and between each predictor
+# compute the Pearson correlation between the predictor variable and
+# associated Cantril Ladder score.

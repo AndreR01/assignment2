@@ -3,3 +3,20 @@
 # Student: 23840638
 set -x
 # Data cleaning script to take three arguments, clean the data and send to STDOUT
+
+#: Check CLI for valid number of arguments
+if [[ $# -ne 3 ]]
+then
+    echo "Usage: $0 <tsv datafile> <tsv datafile> <tsv datafile>." > /dev/stderr
+    exit 0
+fi
+
+# Check file for validity
+for arg in "$@"
+do
+    if [[ ! -s $arg ]]
+    then
+        echo The named input file $arg does not exist or has zero length. > /dev/stderr
+        exit 1
+    fi
+done

@@ -37,9 +37,40 @@ done
 # Check the header line for the number of tabs - must be greater than 3
 for arg in "$@"
 do
-    num_tabs=$(head -1 $arg | awk '{print gsub(/\t/,"")}')
+    num_tabs=$(head -n1 $arg | awk '{print gsub(/\t/,"")}')
+    echo $num_tabs
     if [[ $num_tabs -lt 3 ]]
     then
         echo The file: $arg is not tab seperated. The query cannot be processed.
+        exit 1
     fi
 done
+
+
+for arg in "$@"
+do
+    num_tab=$(head -n1 $arg | awk '{print gsub(/\t/,"")}')
+#    num_col=$(head -n1 $arg | awk '{print NF}')
+    num_col=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
+
+    echo $num_col
+    awk 'NF != $num_col {printf"Line %d from file $arg is bad", NR}' $arg
+#    line_tab=$(awk '{print gsub(/\t/,"")}')
+#    echo $line_tab
+done
+
+
+
+
+#    awk '{if ($line_tab!=$num_tab) {printf"Line %d from file $arg is bad"}}' $arg
+
+
+
+#num_cols=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
+#awk -F'\t' 'NF != $num_cols{print NR;exit}' $arg
+#awk '{if (NF=$num_cols) {printf"Line %d from file $arg is good", NR}}' $arg
+#awk -F'\t' 'NF!=$num_cols{printf "Wrong number of colums at line %d\n", NR}'
+#awk -F'\t' 'NF != $num_cols {print}' $@    
+
+
+

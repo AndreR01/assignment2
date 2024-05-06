@@ -3,6 +3,8 @@
 # Student: 23840638
 set -x
 # Data cleaning script to take three arguments, clean the data and send to STDOUT
+# TODO Choose tsv checker
+
 
 #: Check CLI for valid number of arguments
 if [[ $# -ne 3 ]]
@@ -18,5 +20,26 @@ do
     then
         echo The named input file $arg does not exist or has zero length. > /dev/stderr
         exit 1
+    fi
+done
+
+# Check header line for a tab
+for arg in "$@"
+do
+    if head -1 $arg | grep -q ' '
+    then
+        echo tsv
+    else
+        echo not a tsv
+    fi
+done
+
+# Check the header line for the number of tabs - must be greater than 3
+for arg in "$@"
+do
+    num_tabs=$(head -1 $arg | awk '{print gsub(/\t/,"")}')
+    if [[ $num_tabs -lt 3 ]]
+    then
+        echo The file: $arg is not tab seperated. The query cannot be processed.
     fi
 done

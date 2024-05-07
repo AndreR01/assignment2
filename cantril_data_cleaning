@@ -46,7 +46,7 @@ do
     fi
 done
 
-
+#TODO Implement a loop to compare the current line NF to the head NF and alert if different
 for arg in "$@"
 do
     num_tab=$(head -n1 $arg | awk '{print gsub(/\t/,"")}')
@@ -54,7 +54,11 @@ do
     num_col=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
 
     echo $num_col
-    awk 'NF != $num_col {printf"Line %d from file $arg is bad", NR}' $arg
+    awk -F'\t' '{print NF}' $arg
+    awk -v cols=$num_col '{if (NF != cols) {printf"Line %d missing cells \n ", NR}}' $arg
+
+#    awk -v cols=7  '{if (NF != cols) {printf"Line %d from file is bad  \n", NR}}' $arg
+#    echo | awk '{print NF   }'
 #    line_tab=$(awk '{print gsub(/\t/,"")}')
 #    echo $line_tab
 done

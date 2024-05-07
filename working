@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+num_col=$(head -n1 $1 | awk -F'\t' '{print NF;exit}')
+awk -F'\t' '{print NF}' $1
+
+for arg in "@"
+do
+    num_col=$(head -n1 $1 | awk -F'\t' '{print NF;exit}')
+    if  [[ $num_col -ge 7 ]]
+    then
+        awk -F"\t" '$2!="";exit' | awk -F"\t" '{print " "$1" "$2" "$3" "$4" "$5" "$6" "}' $1
+    fi
+done    
+
+

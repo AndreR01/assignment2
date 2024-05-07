@@ -1,9 +1,13 @@
 Entity	Code	Year	Life expectancy - Sex: all - Age: at birth - Variant: estimates	Cantril ladder score	Population (historical estimates)	Continent
-Finland	FIN	2006	79.4		5266249	
+Finland	FIN	2006	79.4		5266249
+More developed regions		2017	79.4				
 Finland	FIN	2007	79.4		5288694	
+High-income countries		2007	79.3		1127897627	
+
 France	FRA	2002	79.4		59372784	
 France	FRA	2003	79.4		59728260	
 Guernsey	GGY	1998	79.4		58753	
+Netherlands	NLD	2015	81.5	7.339	17041110	Europe
 Japan	JPN	1993	79.4		124779576	
 Jersey	JEY	2003	79.4		88777	
 Kuwait	KWT	2014	79.4	6.295	3761590	
@@ -11,7 +15,7 @@ Luxembourg	LUX	2005	79.4		464868
 Luxembourg	LUX	2006	79.4		472402	
 Maldives	MDV	2014	79.4		416746	
 Monaco	MCO	1996	79.4		31740	
-More developed regions		2017	79.4			
+
 New Zealand	NZL	2004	79.4		4081415	
 Oceania (UN)		2021	79.4		44491724	
 Singapore	SGP	2003	79.4		4226417	
@@ -25,10 +29,24 @@ Bermuda	BMU	2003	79.3		62490
 Bermuda	BMU	2021	79.3		64213	
 Chile	CHL	2013	79.3		17509926	
 Costa Rica	CRI	2011	79.3	7.251115	4679927	
+Saint Martin (French part)	MAF	2015	79.3		35042	North America
 Costa Rica	CRI	2012	79.3		4736593	
 Costa Rica	CRI	2020	79.3	7.0694	5123107	
 Faroe Islands	FRO	2021	79.3		52915	
 Germany	DEU	2005	79.3		81212168	
 Gibraltar	GIB	2021	79.3		32698	
 Greece	GRC	2004	79.3		11115089	
+Low-income countries		1950	31.6		115124011	
+Saint Martin (French part)	MAF	2015	79.3		35042	North America
+Mali	MLI	1968	31.6		5973764	
+South Sudan	SSD	1971	31.6		3396817	
+Afghanistan	AFG	1958	31.5		8333827	
+Bhutan	BTN	1955	31.5		196028	
+South Sudan	SSD	1951	31.5		2526078	
+East Timor	TLS	1958	31.4		455182	
+Oman	OMN	1954	31.4		484747	
+Sierra Leone	SLE	1954	31.3		2106630	
+South Sudan	SSD	1996	31.3		5434896	
 High-income countries		2007	79.3		1127897627	
+Saint Martin (French part)	MAF	2015	79.3		35042	North America
+Mali	MLI	1967	31.2		5888494	

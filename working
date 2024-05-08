@@ -13,3 +13,6 @@ do
     fi
 done
 
+#awk 'FNR==NR{a[$4]=$5;next} {print $1,$2,$3,$4,a[$4]}' _testlife.tsv _testgdp.tsv > _combined
+
+awk -F'\t' '{if (NR==FNR) a[$1]=$2; else print $1 " " a[$1] "   " $2}' _testlife.tsv _testgdp.tsv > _combined

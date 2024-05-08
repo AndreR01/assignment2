@@ -1,8 +1,0 @@
-Entity	Code	Year	Life expectancy - Sex: all - Age: at birth - Variant: estimates	Cantril ladder score	Population (historical estimates)	Continent
-Monaco	MCO	2018	37050	
-Monaco	MCO	2019	86.5		37059	
-Monaco	MCO	2020	86.5		36943	
-Monaco	MCO	2021	85.9		36713	
-Monaco	MCO	2016	85.7		37090	
-Monaco	MCO	2017	85.7		37069	
-Monaco	MCO	2011	85.6		33971	

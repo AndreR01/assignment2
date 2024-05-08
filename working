@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-
-num_col=$(head -n1 $1 | awk -F'\t' '{print NF;exit}')
+set -x
+#num_col=$(head -n1 $1 | awk -F'\t' '{print NF;exit}')
 #awk -F'\t' '{print NF}' $1
-
-num_col=$(head -n1 $1 | awk -F'\t' '{print NF;exit}')
-if  [[ $num_col -ge 7 ]]
-then
-    awk -F"\t" '$2 == ""{next;}{print $0;}' $1 | cut -f1-6
-fi
-   
-
+for arg in "$@"
+do
+    num_col=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
+    if  [[ $num_col -ge 7 ]]
+    then
+        awk -F"\t" '$2 == ""{next;}{print $0;}' $arg | cut -f1-6 > "_${arg}"
+    else
+        awk -F"\t" '$2 == ""{next;}{print $0;}' $arg > "_${arg}"
+    fi
+done
 

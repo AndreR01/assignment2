@@ -1,0 +1,7 @@
+Entity Code
+Year
+GDP per capita, PPP (constant 2017 international $)
+Population (historical estimates)
+Homicide rate per 100,000 population - Both sexes - All ages
+Life expectancy - Sex: all - Age: at birth - Variant: estimates
+Cantril ladder score

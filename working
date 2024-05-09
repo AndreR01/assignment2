@@ -13,6 +13,25 @@ do
     fi
 done
 
-#awk 'FNR==NR{a[$4]=$5;next} {print $1,$2,$3,$4,a[$4]}' _testlife.tsv _testgdp.tsv > _combined
+T=$(printf '\t')
+entity=$(printf "Entity")
+code=$(printf "Code")
+year=$(printf "Year")
+gdp=$(printf "GDP per capita")
+popln=$(printf "Population")
+homicide=$(printf "Homicide Rate")
+life=$(printf "Life Expectancy")
+cantril=$(printf "Cantril Ladder Score")
 
-awk -F'\t' '{if (NR==FNR) a[$1]=$2; else print $1 " " a[$1] "   " $2}' _testlife.tsv _testgdp.tsv > _combined
+
+
+#cat > _combined << EOF
+#$entity $T $code $T $year $T $gdp $T $popln $T $homicide $T $life $T$cantril 
+#awk -F, 'BEGIN{RS="\r\n" ; OFS=FS} NR==FNR{a[$1 FS $2 FS $4 FS $5] = $0; next} {ind = $1 FS $2 FS $4 FS $5} ind in a {print $3, a[ind]}' file2 file1
+#testgdp.tsv testlife.tsv
+#printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$entity" "$code" "$year" "$gdp" "$popln" "$homicide" "$life" "$cantril" >_combined.tsv
+#highest=$(cut -f3,4-7 -d"," $1 | grep -e $1 | grep -e $3 | sort -t "," -nr -k5 | head -1)
+#awk 'FNR==NR{a[$1];next} $1 in a{print $0}' _testlife.tsv _testgdp.tsv > _combined
+#awk 'NR==FNR{a[NR]=$0; next} {print a[FNR], $0}' _testlife.tsv _testgdp.tsv > _combined.tsv
+#awk 'FNR==NR{a[$4]=$5;next} {print $1,$2,$3,$4,a[$4]}' _testlife.tsv _testgdp.tsv > _combined
+#awk -F'\t' '{if (NR==FNR) a[$1]=$2; else print $1 " " a[$1] "   " $2}' _testlife.tsv _testgdp.tsv > _combined

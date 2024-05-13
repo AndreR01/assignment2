@@ -4,13 +4,7 @@ set -x
 #awk -F'\t' '{print NF}' $1
 for arg in "$@"
 do
-    num_col=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
-    if  [[ $num_col -ge 7 ]]
-    then
-        awk -F"\t" '$2 == ""{next;}{print $0;}' $arg | cut -f1-6 > "_${arg}"
-    else
-        awk -F"\t" '$2 == ""{next;}{print $0;}' $arg > "_${arg}"
-    fi
+awk -F '\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 > "_$arg"
 done
 
 T=$(printf '\t')
@@ -23,10 +17,14 @@ homicide=$(printf "Homicide Rate")
 life=$(printf "Life Expectancy")
 cantril=$(printf "Cantril Ladder Score")
 
+#for arg in "$@"
+#do
+#    awk -F '\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg > "_$arg"
+#done
 
 
-#cat > _combined << EOF
-#$entity $T $code $T $year $T $gdp $T $popln $T $homicide $T $life $T$cantril 
+#awk -f array.awk /dev/null TEST ARRAY
+
 #awk -F, 'BEGIN{RS="\r\n" ; OFS=FS} NR==FNR{a[$1 FS $2 FS $4 FS $5] = $0; next} {ind = $1 FS $2 FS $4 FS $5} ind in a {print $3, a[ind]}' file2 file1
 #testgdp.tsv testlife.tsv
 #printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$entity" "$code" "$year" "$gdp" "$popln" "$homicide" "$life" "$cantril" >_combined.tsv

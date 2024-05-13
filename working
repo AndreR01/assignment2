@@ -4,7 +4,12 @@ set -x
 #awk -F'\t' '{print NF}' $1
 for arg in "$@"
 do
-awk -F '\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 > "_$arg"
+    #read the header, get the NF and add one.
+    #create a concat column of entity and year.a:L
+    fields=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
+    num_col=$(($fields+1))
+    echo $num_col
+    awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | awk -F'\t' 'NR==1{$num_col="merge";print;next}{$NF="${1}${3}"' | sort -k1,1 -k3,3n | cut -f1-6 > "_$arg"
 done
 
 T=$(printf '\t')
@@ -17,19 +22,11 @@ homicide=$(printf "Homicide Rate")
 life=$(printf "Life Expectancy")
 cantril=$(printf "Cantril Ladder Score")
 
-#for arg in "$@"
-#do
-#    awk -F '\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg > "_$arg"
-#done
+#awk 'NR==FNR{array[$1]=$3FS$4FS$5FS$6FS$7FS$8; next} { print $0,array[$1]}' file2 file1
+
+#echo "Entity Code \t Year \t GDP per capita\t Population \t Homicide \t Life expectancy \t Cantril ladder score" > final_extract.txt
 
 
-#awk -f array.awk /dev/null TEST ARRAY
-
-#awk -F, 'BEGIN{RS="\r\n" ; OFS=FS} NR==FNR{a[$1 FS $2 FS $4 FS $5] = $0; next} {ind = $1 FS $2 FS $4 FS $5} ind in a {print $3, a[ind]}' file2 file1
-#testgdp.tsv testlife.tsv
-#printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$entity" "$code" "$year" "$gdp" "$popln" "$homicide" "$life" "$cantril" >_combined.tsv
-#highest=$(cut -f3,4-7 -d"," $1 | grep -e $1 | grep -e $3 | sort -t "," -nr -k5 | head -1)
-#awk 'FNR==NR{a[$1];next} $1 in a{print $0}' _testlife.tsv _testgdp.tsv > _combined
-#awk 'NR==FNR{a[NR]=$0; next} {print a[FNR], $0}' _testlife.tsv _testgdp.tsv > _combined.tsv
-#awk 'FNR==NR{a[$4]=$5;next} {print $1,$2,$3,$4,a[$4]}' _testlife.tsv _testgdp.tsv > _combined
-#awk -F'\t' '{if (NR==FNR) a[$1]=$2; else print $1 " " a[$1] "   " $2}' _testlife.tsv _testgdp.tsv > _combined
+#awk -F, 'NR==FNR{a[$1]=$2;b[$1]=next}
+#{if ($2 in a){$3=$2;$4=a[$2];delete a[$2];}}1' OFS="\t" _gdp-vs-happiness.tsv _homicide-rate-unodc.tsv _life-satisfaction-vs-life-expectancy.tsv
+#awk 'BEGIN{FS=","} NR==1{print;next} {a[$2][$3]=$2 in a ? a[$2] " " $1 : $1} END{for(i in a) print a[i] "," i}'

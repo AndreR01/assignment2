@@ -1,16 +1,50 @@
 #!/usr/bin/env bash
-set -x
-#num_col=$(head -n1 $1 | awk -F'\t' '{print NF;exit}')
-#awk -F'\t' '{print NF}' $1
+#set -x
+#for arg in "$@"
+#do
+#    fields=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
+#    num_col=$(($fields+1))
+#    echo $num_col
+#
+#    awk 'BEGIN {FS="\t"} NR==FNR {arr1[NR]=$0; next} NR==FNR+num1 {arr2[NR]=$0; next} {print arr1[FNR], arr2[FNR], $0}' gdp-vs-happiness.tsv homicide-rate-unodc.tsv life-satisfaction-vs-life-expectancy.tsv> extract.tsv
+
+#    awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1,1 -k3,3n | cut -f1-6 > "_$arg"
+#done
+
+
+
+
 for arg in "$@"
 do
-    #read the header, get the NF and add one.
-    #create a concat column of entity and year.a:L
-    fields=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
-    num_col=$(($fields+1))
-    echo $num_col
-    awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | awk -F'\t' 'NR==1{$num_col="merge";print;next}{$NF="${1}${3}"' | sort -k1,1 -k3,3n | cut -f1-6 > "_$arg"
+    sed -n '1p' $arg > header_extract.tsv
+    if grep -E -q [Ll]ife header_extract.tsv
+    then
+        echo In "$arg"
+        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1,1 -k3,3n | cut -f1-6 > "_life"
+    elif grep -q GDP header_extract.tsv
+    then
+        echo In "$arg"
+        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1,1 -k3,3n | cut -f1-6 > "_gdp"
+    elif grep -q Homicide header_extract.tsv
+    then
+        echo In "$arg"
+        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1,1 -k3,3n | cut -f1-4 > "_homicide"
+    fi
 done
+
+
+
+    #if grep -q "life" $col_header 
+    #then
+    #    echo In "$arg"
+    #elif grep -q "gdp" $col_header
+    #then
+    #    echo In "$arg"
+    #elif grep -q "homicide" $col_header
+    #then
+    #    echo In "$arg"
+    #fi
+#:done
 
 T=$(printf '\t')
 entity=$(printf "Entity")

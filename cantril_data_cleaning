@@ -10,7 +10,7 @@ set -x
 if [[ $# -ne 3 ]]
 then
     echo "Usage: $0 <tsv datafile> <tsv datafile> <tsv datafile>." > /dev/stderr
-    exit 0
+    exit 1
 fi
 
 # Check file for validity
@@ -18,7 +18,7 @@ for arg in "$@"
 do
     if [[ ! -s $arg ]]
     then
-        echo The named input file $arg does not exist or has zero length. > /dev/stderr
+        echo "Error: The file $arg does not exist or is not readable." > /dev/stderr
         exit 1
     fi
 done
@@ -34,17 +34,24 @@ do
     fi
 done
 
-# Check the header line for the number of tabs - must be greater than 3
+# Check the number of columns in each file
 for arg in "$@"
 do
-    num_tabs=$(head -n1 $arg | awk '{print gsub(/\t/,"")}')
-    echo $num_tabs
-    if [[ $num_tabs -lt 3 ]]
-    then
-        echo The file: $arg is not tab seperated. The query cannot be processed.
-        exit 1
-    fi
+    num_cols=$(head -n1 "$arg" | awk -F'\t' '{print NF}')
+    tail -n+2 "$arg" | awk -F'\t' -v num_cols="$num_cols" 'NF != num_cols {print $0}' > /dev/stderr
+    exit 1
 done
+
+# Check data for data range, sort and ignore "Continent" column for Life and GDP files
+for arg in "$@"
+do
+    awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1,1 -k3,3n | cut -f1-6 > "_$arg"
+done
+
+
+
+
+
 
 #TODO Implement a loop to compare the current line NF to the head NF and alert if different
 for arg in "$@"

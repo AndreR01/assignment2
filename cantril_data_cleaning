@@ -3,8 +3,16 @@
 # Student: 23840638
 set -x
 # Data cleaning script to take three arguments, clean the data and send to STDOUT
-# TODO Choose tsv checker
+#check the files are tab seperated
+#report any lines that do not have the same number of cells to stderr
+#clean the data - date ranges, code column is empty
+#determine which files contain which data (homicides will only have NF = 4)
 
+#sort files according to entity (column 1)
+#create and store key:val array for entity and year
+#create a tab separate file containing the header list outlined in asssignment
+#use the key:val array to refernce the rows in the cleaned files to build the new data file
+#remove temp files
 
 #: Check CLI for valid number of arguments
 if [[ $# -ne 3 ]]
@@ -23,6 +31,8 @@ do
     fi
 done
 
+# TODO Choose tsv checker
+
 # Check header line for a tab
 for arg in "$@"
 do
@@ -35,7 +45,6 @@ do
 done
 
 #TODO Add back code to check the tab separated heading and check each line for same number of cells
-
 
 # loop through input files:
 # - check the header for life, gdp and homicide

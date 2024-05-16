@@ -12,78 +12,115 @@
 #use the key:val array to refernce the rows in the cleaned files to build the new data file
 #remove temp files
 
-for arg in "$@"
-do
-    sed -n '1p' $arg > header_extract.tsv\
+#for arg in "$@"
+#do
+#    sed -n '1p' $arg > header_extract.tsv\
     # if the word life appears in the current file's header
-    if grep -E -q [Ll]ife header_extract.tsv
-    then
-        # exclude rows that fall outside the date range and those that do not contain a Code in column 2
-        # cut the columns to exclude column 7 (Continent)
-        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 -k3,3n | cut -f1-6 > "_life.tsv"
-        awk 'BEGIN{FS="\t"; OFS=FS}{$7=$2 FS $3}1' _life.tsv | sort -k7 > _tmplife.tsv
-    elif grep -E -q [Gg][Dd][Pp] header_extract.tsv
-    then
-        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 -k3,3n | cut -f1-6 > "_gdp.tsv"
-        awk 'BEGIN{FS="\t"; OFS=FS}{$7=$2 FS $3}1' _gdp.tsv | sort -k7 > _tmpgdp.tsv
-    elif grep -q [Hh]omicide header_extract.tsv
-    then
-        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 -k3,3n | cut -f1-4 > "_homicide.tsv"
-        awk 'BEGIN{FS="\t"; OFS=FS}{$5=$2 FS $3}1' _homicide.tsv | sort -k5 > _tmphomicide.tsv
-    fi
+#    if grep -E -q [Ll]ife header_extract.tsv
+#    then
+#        # exclude rows that fall outside the date range and those that do not contain a Code in column 2
+#        # cut the columns to exclude column 7 (Continent)
+#        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 -k3,3n | cut -f1-6 > "_life.tsv"
+#        awk 'BEGIN{FS="\t"; OFS=FS}{$7=$2 FS $3}1' _life.tsv | sort -k7 > _tmplife.tsv
+#    elif grep -E -q [Gg][Dd][Pp] header_extract.tsv
+#    then
+#        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 -k3,3n | cut -f1-6 > "_gdp.tsv"
+#        awk 'BEGIN{FS="\t"; OFS=FS}{$7=$2 FS $3}1' _gdp.tsv | sort -k7 > _tmpgdp.tsv
+#    elif grep -q [Hh]omicide header_extract.tsv
+#    then
+#        awk -F'\t' '(int($3) < 2011 || int($3) > 2021) || $2 == ""{next;}{print $0}' $arg | sort -k1 -k3,3n | cut -f1-4 > "_homicide.tsv"
+#        awk 'BEGIN{FS="\t"; OFS=FS}{$5=$2 FS $3}1' _homicide.tsv | sort -k5 > _tmphomicide.tsv
+#    fi
 #TODO remove header_extract.tsv
-done
+#done
 
 # Process each file
-#for arg in "$@"; do
-#    header=$(head -1 "$arg")
-#    echo "$header" > header_extract.tsv
-#
-#    if echo "$header" | grep -E -q [Ll]ife; then
-#        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life.tsv
-#        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _life.tsv | sort -k7 > _tmplife.tsv
-#    elif echo "$header" | grep -E -q [Gg][Dd][Pp]; then
-#        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp.tsv
-#        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _gdp.tsv | sort -k7 > _tmpgdp.tsv
-#    elif echo "$header" | grep -q [Hh]omicide; then
-#        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide.tsv
-#        #awk 'BEGIN {FS="\t"; OFS=FS} {$5=$2$3}1' _homicide.tsv | sort -k5 > _tmphomicide.tsv
-#        awk 'BEGIN {FS="\t"; OFS=FS} {$5=$2$3}1' _homicide.tsv | sort -k5 > _tmphomicide.tsv
-#    fi
-#done
+for arg in "$@"; do
+    header=$(head -1 "$arg")
+    echo "$header" > header_extract.tsv
+
+    if echo "$header" | grep -E -q [Ll]ife; then
+        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life.tsv
+        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _life.tsv | sort -k1,1 > _tmplife.tsv
+    elif echo "$header" | grep -E -q [Gg][Dd][Pp]; then
+        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp.tsv
+        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _gdp.tsv | sort -k1,1 > _tmpgdp.tsv
+    elif echo "$header" | grep -q [Hh]omicide; then
+        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide.tsv
+        #awk 'BEGIN {FS="\t"; OFS=FS} {$5=$2$3}1' _homicide.tsv | sort -k5 > _tmphomicide.tsv
+        awk 'BEGIN {FS="\t"; OFS=FS} {$5=$2$3}1' _homicide.tsv | sort -k1,1 > _tmphomicide.tsv
+    fi
+done
 
 #TODO How/why do unique values extract without having to stipulate
 # Create file containing unique combination of Code and Year combination
-cut -f7-8 _tmplife.tsv | awk '{print $0}' |sort -k1 >> _tmpAll
-cut -f7-7 _tmpgdp.tsv |  awk '{print $0}' |sort -k1 >> _tmpAll
-cut -f5-6 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 >> _tmpAll
+cut -f7 _tmplife.tsv | awk '{print $0}' |sort -k1 > _tmpAll
+cut -f7 _tmpgdp.tsv |  awk '{print $0}' |sort -k1 >> _tmpAll
+cut -f5 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 >> _tmpAll
 
 
+join _tmplife.tsv _tmpgdp.tsv | join - _tmphomicide.tsv > nearly_done
 
-#join -j  1 -2 7 -o 2.1 2.2 2.3 _all _tmpgdp.tsv > merged1.tsv
-#join -1 1 -2 7 -o 2.1 2.2 2.3 2.4 2.5 2.6 _all _tmplife.tsv > merged2.tsv
-#join -1 1 -2 5 -o 2.1 2.2 2.3 2.4  _all _tmphomicide.tsv > merged3.tsv
 
+#awk 'BEGIN { 
+#FS="\t";
+#getline
+#NR=0
+#OFS=FS
+#} 
+#FNR == NR {
+#	key[$7 $8]=$0;
+#}
+#FNR < NR { 
+#	k=$7 $8;
+#in both
+#	if(k in key) {
+#		delete key[k]
+#		print;
+#	}else{
+#		print $0
+##only in 2
+#	}
+#}
+#END {
+#	for(i in key){
+##only in 1
+#		print key[i]
+#	}
+#}' _tmplife.tsv _tmpgdp.tsv > _almost
+
+
+#awk 'BEGIN {
+#FS="\t";
+#getline
+#NR=0
+#OFS=FS
+#}
+#FNR == NR {
+#	key[$7 $8]=$0;
+#}
+#FNR < NR {
+#	k=$5 $6;
+##in both
+#	if(k in key) {
+#		delete key[k]
+#		print;
+#	}else{
+#		print $0
+#only in 2
+#	}
+#}
+#END {
+#	for(i in key){
+#only in 1
+#		print key[i]
+#	}
+#}' _tmplife.tsv _tmphomicide.tsv >> _almost
 
 
 #CODE TO JOIN FILES
-awk ' NR==FNR{ a[$2 FS $3]=$0;next} ($1 FS $2) in a { print $0 } ' _tmpAll _tmpgdp.tsv > nearly_done
+#awk 'BEGIN{FS="\t"} NR==FNR{ a[$7 FS $8]=$0;next} ($7 FS $8) in a { print $1 $2 } ' _tmpgdp.tsv _tmplife.tsv > nearly_done
 #awk ' NR==FNR{ a[$2 FS $3]=$5;next} ($6 FS $7) in a { print $0 FS a[$6 FS $7]} ' file2 file1
-
-#awk 'NR==FNR {key[$1]=$1} {if key[$7]=END{for (val in key){print val, key[val]}}' _all > _nearly
-
-
-
-
-
-
-#awk '{map[$2]=$1} END{for (key in map){print key, map[key]}}' infile
-
-#awk -F"\t" ' FNR==NR {a[$1]=$0 ($1 in a)=$7 {print $0}' abcdefg.txt
-#awk 'FNR==NR { a[$1]=$1; next } $1 in a { print a[$1] }' _all _tmplife.tsv > output.tsv
-
-#awk -f join.awk _tmpgdp.tsv _tmphomicide.tsv _tmplife.tsv
-
 
 #join -1 7 -2 7 -o 1.7 1.1 1.2 1.3 1.4 1.5 1.6 2.5 2.6 _tmplife.tsv _tmpgdp.tsv > merged1.tsv
 #join -1 7 -2 5 -o 2.5 1.1 1.2 1.3 1.4 1.5 1.6 2.4 _tmplife.tsv _tmphomicide.tsv > merged2.tsv
@@ -92,4 +129,3 @@ awk ' NR==FNR{ a[$2 FS $3]=$0;next} ($1 FS $2) in a { print $0 } ' _tmpAll _tmpg
 #join -1 7 -2 7 -o 1.7 2.7 1.1 1.2 1.3 1.4 1.5 1.6 2.1 2.2 2.3 2.4 2.5 2.6 _tmplife.tsv _tmpgdp.tsv > merged1.tsv 
 #join -1 7 -2 5 -o 1.7 2.5 1.1 1.2 1.3 1.4 1.5 1.6 2.1 2.2 2.3 2.4 _tmplife.tsv _tmphomicide.tsv > merged2.tsv 
 #join -1 1 -2 1 -o 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 1.10 1.11 1.12 2.1 2.2 2.3 2.4 merged1.tsv merged2.tsv > merged.tsv
-

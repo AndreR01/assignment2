@@ -53,9 +53,9 @@ done
 
 #TODO How/why do unique values extract without having to stipulate
 # Create file containing unique combination of Code and Year combination
-cut -f7 _tmplife.tsv | awk '{print $0}' |sort -k1 > _tmpAll
-cut -f7 _tmpgdp.tsv |  awk '{print $0}' |sort -k1 >> _tmpAll
-cut -f7 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 >> _tmpAll
+cut -f7 _tmplife.tsv | awk '{print $0}' | sort -u -k1 > _tmpAll
+cut -f7 _tmpgdp.tsv |  awk '{print $0}' | sort -u -k1 >> _tmpAll
+cut -f7 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 | uniq >> _tmpAll
 
 
 #create file with all possible Code and Year combinations
@@ -71,32 +71,76 @@ cut -f7 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 >> _tmpAll
 #(join -a1 -a2 -e NULL -o '1.1 1.2 1.3 1.4 1.5 1.6 2.5 2.6' file1 file2; join -a1 -a2 -e NULL -o '2.1 2.2 2.3 2.4 1.5 1.6 2.5 2.6' file1 file2 )| grep -v '^NULL' | sort -k 1,2 | uniq
 
 
-awk 'BEGIN { 
-FS="\t";
-getline
-NR=0
-OFS=FS
-} 
-FNR == NR {
-	key[$2 $3]=$0;
-}
-FNR < NR { 
-	k=$2 $3;
-#in both
-	if(k in key) {
-		delete key[k]
-		print;
-	}else{
-		print $1,$2,$3,$5,$6
-##only in 2
-	}
-}
-END {
-	for(i in key){
-##only in 1
-		print key[i],$4
-	}
-}' _tmphomicide.tsv _tmpgdp.tsv | sort >  _almost
+awk '
+    BEGIN { FS=OFS="\t" }
+    NR == FNR {
+        if ( FNR == 1 ) {
+            print 1, $0
+            nf = NF
+        }
+        else {
+            vals[$7] = $0
+        }
+        next
+    }
+    FNR > 1 {
+        if ( $1 in vals ) {
+            $0 = vals[$7]
+            delete vals[$7]
+        }
+        $nf = $nf
+        print 2, $7,$1,$2,$3,$5,$6
+    }
+    END {
+        for ( key in vals ) {
+            print 2, vals[key]
+        }
+    }
+' _tmpAll _tmpgdp.tsv |
+sort -k1,1n -k2 |
+cut -f 2- > nearly_there
+
+
+#for i in $(cat _tmpAll); do   grep -i "$i" _tmphomicide.tsv > almosth; done
+
+#awk 'BEGIN { 
+#FS="\t";
+#getline
+#NR=0
+#OFS=FS
+#} 
+#FNR == NR {
+#	key[$1]=$0; print key;
+#}
+#FNR < NR { 
+#	k=$7;
+##in both
+#	if(k in key) {
+#    	delete key[k]
+#		print;
+#}else{
+#		print $1,$2,$3,$4
+###only in 2
+#	}
+#}
+#END {
+#	for(i in key){
+###only in 1
+#		print key[i]
+#	}
+#}' _tmpAll _tmphomicide.tsv | sort >  _almosth
+
+
+#awk '{
+#    map[$1 $2] = $0
+#}
+#
+#END {
+#    # Iterate over all keys
+#    for (key in map) {
+#        print key, map[key]
+#    }
+#}' _tmpAll _tmphomicide.tsv | sort >  _almosth
 
 
 #awk 'BEGIN {

@@ -53,12 +53,15 @@ done
 
 #TODO How/why do unique values extract without having to stipulate
 # Create file containing unique combination of Code and Year combination
-cut -f9 _tmplife.tsv | awk '{print $0}' | sort -u -k1 > _tmpAll
-cut -f9 _tmpgdp.tsv |  awk '{print $0}' | sort -u -k1 >> _tmpAll
-cut -f9 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 | uniq >> _tmpAll
+cut -f9 _tmplife.tsv | awk '{print $0}' | sort -u -k1 > _cutLife
+cut -f9 _tmpgdp.tsv |  awk '{print $0}' | sort -u -k1 > _cutGdp
+cut -f9 _tmphomicide.tsv |  awk '{print $0}' | sort -k1  > _cutHomi
 
+join -a 1 -a 2 -t $'\t' -1 1 -2 1 -o 0,1.1,2.1 _cutGdp _cutHomi > _tmpCut
+join -a 1 -a 2 -t $'\t' -1 1 -2 1 -o 0,1.1,2.1 _tmpCut _cutLife | cut -f1 | sort -u -k1> _tmpAll
 
 #create file with all possible Code and Year combinations
+
 #create the key value on the combination and the line as the value
 #iterate over the three files starting with gdp, then homicide and life > print output to a file
 #cut the data form the file and append to finished file
@@ -70,11 +73,14 @@ cut -f9 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 | uniq >> _tmpAll
 
 
 
-#TESTING THEORY
+#GOOD
 #https://alexharv074.github.io/2018/09/22/the-four-sql-joins-using-linux-join-and-sort.html
-join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmpgdp.tsv > nearly_done1
-join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,1.1,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmphomicide.tsv > nearly_done2
-join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmplife.tsv > nearly_done3
+#join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmpgdp.tsv > nearly_done1
+#join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,1.1,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmphomicide.tsv > nearly_done2
+#join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmplife.tsv > nearly_done3
+
+
+
 
 #join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 1 -o 0,1.1,1.2,1.3,1.4,2.1,2.1,2.1,2.1,2.1,1.9 _tmphomicide.tsv _tmpAll > nearly_done2
 #join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 1 -o 0,1.1,1.2,1.3,1.4,1.5,2.1,2.1,2.1,2.1,1.9 _tmplife.tsv _tmpAll > nearly_done3
@@ -82,7 +88,7 @@ join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1
 
 
 
-#GOOD
+#FIRST GOOD
 #join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.4,1.1,1.1,2.9,1.9 _tmphomicide.tsv _tmpgdp.tsv > nearly_done5
 #join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 9 -o 1.1,1.2,1.3,1.4,1.5,1.6,2.4,2.5,2.9 nearly_done5 _tmplife.tsv > all_there
 

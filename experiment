@@ -37,7 +37,7 @@
 # Process each file
 for arg in "$@"; do
     header=$(head -1 "$arg")
-    echo "$header" > header_extract.tsv
+    echo "$header" > _header_extract.tsv
 
     if echo "$header" | grep -E -q [Ll]ife; then
         awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life.tsv
@@ -75,12 +75,13 @@ join -a 1 -a 2 -t $'\t' -1 1 -2 1 -o 0,1.1,2.1 _tmpCut _cutLife | cut -f1 | sort
 
 #GOOD
 #https://alexharv074.github.io/2018/09/22/the-four-sql-joins-using-linux-join-and-sort.html
-#join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmpgdp.tsv > nearly_done1
-#join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,1.1,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmphomicide.tsv > nearly_done2
-#join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmplife.tsv > nearly_done3
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 0,2.1,2.2,2.3,2.5,2.6,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmpgdp.tsv > _gdpDone
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 0,2.1,2.2,2.3,2.4,1.1,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmphomicide.tsv > _homicideDone
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 0,2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmplife.tsv > _lifeDone
 
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 1 -o 0,1.2,1.3,1.4,1.5,1.6,2.5,1.1,1.1,1.1 _gdpDone _homicideDone > _clean1
 
-
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 1 -o 0,1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,1.1 _clean1 _lifeDone > _cleanDone
 
 #join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 1 -o 0,1.1,1.2,1.3,1.4,2.1,2.1,2.1,2.1,2.1,1.9 _tmphomicide.tsv _tmpAll > nearly_done2
 #join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 1 -o 0,1.1,1.2,1.3,1.4,1.5,2.1,2.1,2.1,2.1,1.9 _tmplife.tsv _tmpAll > nearly_done3

@@ -41,21 +41,21 @@ for arg in "$@"; do
 
     if echo "$header" | grep -E -q [Ll]ife; then
         awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life.tsv
-        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _life.tsv | sort -k1,1 > _tmplife.tsv
+        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _life.tsv | sort -t $'\t' -k9 > _tmplife.tsv
     elif echo "$header" | grep -E -q [Gg][Dd][Pp]; then
         awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp.tsv
-        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _gdp.tsv | sort -k1,1 > _tmpgdp.tsv
+        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _gdp.tsv | sort -t $'\t' -k9 > _tmpgdp.tsv
     elif echo "$header" | grep -q [Hh]omicide; then
         awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide.tsv
-        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _homicide.tsv | sort -k1,1 > _tmphomicide.tsv
+        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _homicide.tsv | sort -t $'\t' -k9 > _tmphomicide.tsv
     fi
 done
 
 #TODO How/why do unique values extract without having to stipulate
 # Create file containing unique combination of Code and Year combination
-cut -f7 _tmplife.tsv | awk '{print $0}' | sort -u -k1 > _tmpAll
-cut -f7 _tmpgdp.tsv |  awk '{print $0}' | sort -u -k1 >> _tmpAll
-cut -f7 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 | uniq >> _tmpAll
+cut -f9 _tmplife.tsv | awk '{print $0}' | sort -u -k1 > _tmpAll
+cut -f9 _tmpgdp.tsv |  awk '{print $0}' | sort -u -k1 >> _tmpAll
+cut -f9 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 | uniq >> _tmpAll
 
 
 #create file with all possible Code and Year combinations
@@ -63,43 +63,35 @@ cut -f7 _tmphomicide.tsv |  awk '{print $0}' | sort -k1 | uniq >> _tmpAll
 #iterate over the three files starting with gdp, then homicide and life > print output to a file
 #cut the data form the file and append to finished file
 
+#join -a 1 -a 2 -o auto e $'\t' -1 1 -2 9 1.1,2.9 _tmpAll _tmpgdp.tsv > nearly_done1
+#join -o auto -e '' -t $'\t' -1 9 -2 1 -o auto _tmphomicide.tsv _tmpAll > nearly_done2
+#join -o auto -e '' -t $'\t' -1 9 -2 1 -o auto _tmplife.tsv _tmpAll > nearly_done3
 
+
+
+
+#TESTING THEORY
 #https://alexharv074.github.io/2018/09/22/the-four-sql-joins-using-linux-join-and-sort.html
-#join -a 1 -a 2 -e NULL -t$"\t" -1 7 -2 7 -o 2.1,2.2,2.3,1.5,1.6,2.4 _tmphomicide.tsv _tmpgdp.tsv> nearly_done
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmpgdp.tsv > nearly_done1
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,1.1,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmphomicide.tsv > nearly_done2
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmplife.tsv > nearly_done3
+
+#join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 1 -o 0,1.1,1.2,1.3,1.4,2.1,2.1,2.1,2.1,2.1,1.9 _tmphomicide.tsv _tmpAll > nearly_done2
+#join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 1 -o 0,1.1,1.2,1.3,1.4,1.5,2.1,2.1,2.1,2.1,1.9 _tmplife.tsv _tmpAll > nearly_done3
+
+
+
+
+#GOOD
+#join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.4,1.1,1.1,2.9,1.9 _tmphomicide.tsv _tmpgdp.tsv > nearly_done5
+#join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 9 -o 1.1,1.2,1.3,1.4,1.5,1.6,2.4,2.5,2.9 nearly_done5 _tmplife.tsv > all_there
+
+#join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 9 -o 2.1,2.2,2.3,2.5,2.6,1.4,1.1,1.1,2.9,1.9 _tmphomicide.tsv _tmpgdp.tsv > nearly_done5
+#join -a 1 -a 2 -e '' -t $'\t' -1 9 -2 9 -o 1.1,1.2,1.3,1.4,1.5,1.6,2.4,2.5,2.9 nearly_done5 _tmplife.tsv > all_there
+
 
 #https://stackoverflow.com/questions/48411579/full-outer-join-on-both-files-by-keeping-certain-columns-in-both-the-files-intac
 #(join -a1 -a2 -e NULL -o '1.1 1.2 1.3 1.4 1.5 1.6 2.5 2.6' file1 file2; join -a1 -a2 -e NULL -o '2.1 2.2 2.3 2.4 1.5 1.6 2.5 2.6' file1 file2 )| grep -v '^NULL' | sort -k 1,2 | uniq
-
-
-awk '
-    BEGIN { FS=OFS="\t" }
-    NR == FNR {
-        if ( FNR == 1 ) {
-            print 1, $0
-            nf = NF
-        }
-        else {
-            vals[$7] = $0
-        }
-        next
-    }
-    FNR > 1 {
-        if ( $1 in vals ) {
-            $0 = vals[$7]
-            delete vals[$7]
-        }
-        $nf = $nf
-        print 2, $7,$1,$2,$3,$5,$6
-    }
-    END {
-        for ( key in vals ) {
-            print 2, vals[key]
-        }
-    }
-' _tmpAll _tmpgdp.tsv |
-sort -k1,1n -k2 |
-cut -f 2- > nearly_there
-
 
 #for i in $(cat _tmpAll); do   grep -i "$i" _tmphomicide.tsv > almosth; done
 

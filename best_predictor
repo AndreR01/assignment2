@@ -2,6 +2,55 @@
 # Author: Andre Rampono
 # Student: 23840638
 set -x
-# Take the input from cantril_data_cleaning and between each predictor
-# compute the Pearson correlation between the predictor variable and
-# associated Cantril Ladder score.
+# Take the input from cantril_data_cleaningn as a input.
+# For each country calucuate the Pearson correlation between the predictor variable
+# given Cantril Ladder score.
+# Calculate the mean correlation of a predictor and the best predictor will have the largest absolute value
+
+# Check CLI for valid number of arguments
+if [[ $# -ne 1 ]]; then
+	echo "Usage: $0 <tsv datafile> <tsv datafile> <tsv datafile>." > /dev/stderr
+	exit 1
+fi
+
+
+
+# Check the file contains data
+#for arg in "$@"; do
+#if [[ ! -s $arg ]]; then
+#	echo "Error: The file $arg does not exist or is not readable." > /dev/stderr
+#        exit 1
+#	fi
+#done
+
+# Calculations
+#https://www.unix.com/shell-programming-and-scripting/154844-calculate-correlation-between-two-fields.html
+# get every x and every y and put into an array
+
+
+
+
+awk -F'\t' -v c="10" '
+{ d=$1; for(i=c;i;i--) {
+    x[i]=x[i-1]
+    y[i]=y[i-1] }
+    x[0]=$3
+    y[0]=$4
+}
+END { for(i=0;i<c;i++) {
+        sx+=x[i]
+        sy+=y[i]
+        sxy+=x[i]*y[i]
+        sx2+=x[i]*x[i]
+        sy2+=y[i]*y[i] }
+    print d, c, ( c * sxy - sx * sy ) / ( sqrt(c*sx2 - sx*sx) * sqrt(c*sy2 - sy * sy))
+}' OFS='\t' $1 > corrFile
+
+# count the number of inputs
+
+# (every x * every y) * number of inputs
+# sum of x
+# sum of y
+# SQRT((number of inputs * (sum every x * x)) * ((sum of x)(sum of x)) * SQRT((number of inputs * ( sum every y * y))* ((sum of y)(sum of y))
+
+# sum of each predictor / number of input predictors

@@ -1,31 +1,32 @@
 #!/usr/bin/env bash
 # Author: Andre Rampono
 # Student: 23840638
-set -x
+#set -x
 # Data cleaning script to take three arguments, clean the data and send resulting data to STDOUT
-# check the files are tab seperated
-# report any lines that do not have the same number of cells to stderr
-# clean the data - date ranges, code column is empty
-# determine which files contain which data (homicides will only have NF = 4)
-
-# sort files according to entity (column 1)
-# create and store key:val array for entity and year
-# create a tsv file containing the header list outlined in asssignment
-# use the key:val (entityYear) array to reference the rows in the cleaned files and build the new data file
-# remove temp files
+#### FUNCTION BEGINS
+# Given three tsv data files, clean each file for a date range (2011-2021),
+# remove the Continent column from GDP and Life files as well as rows
+# that do not contain a Code for the associated Entity column
+# Format of results depends on $2 input
+# ARGUMENTS:
+#   $1: tsv data file
+#   $2: tsv data file
+#   $3: tsv data file
+# OUTPUTS
+#   STDOUT: the cleaned data of the three input files combined from selected columns
+#           to derive the best predictor of Cantril-ladder life-satisfaction scores.
+#   STDERR: All errors
+### FUNCTION END
 
 # Check CLI for valid number of arguments
-if [[ $# -ne 3 ]]
-then
+if [[ $# -ne 3 ]]; then
     echo "Usage: $0 <tsv datafile> <tsv datafile> <tsv datafile>." > /dev/stderr
     exit 1
 fi
 
 # Check file for validity
-for arg in "$@"
-do
-    if [[ ! -s $arg ]]
-    then
+for arg in "$@"; do
+    if [[ ! -s $arg ]]; then
         echo "Error: The file $arg does not exist or is not readable." > /dev/stderr
         exit 1
     fi
@@ -34,66 +35,111 @@ done
 # TODO Choose tsv checker
 
 # Check header line for a tab
-for arg in "$@"
-do
-    if head -1 $arg | grep -q ' '
-    then
-        echo tsv
-    else
-        echo not a tsv
-    fi
-done
+#for arg in "$@"; do
+#    if head -1 $arg | grep -q ' '; then
+#        echo Check for tab in file tsv
+#    else
+#        echo Check if tab does not exist in tsv
+#    fi
+#done
 
 #TODO Implement a loop to compare the current line NF to the head NF and alert if different
 # Check each line against header tabs
-for arg in "$@"
-do
+# best predictor of Cantril-ladder life-satisfaction scores
+for arg in "$@"; do
     num_tab=$(head -n1 $arg | awk '{print gsub(/\t/,"")}')
     num_col=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
 
-    echo $num_col
-    awk -F'\t' '{print NF}' $arg
-    awk -v cols=$num_col '{if (NF != cols) {printf"Line %d missing cells \n ", NR}}' $arg
+    #echo $num_col
+    #awk -F'\t' '{print NF}' $arg
+    awk -v cols=$num_col '{if (NF != cols) {printf"Line %d missing cells \n ", NR}}' $arg > /dev/null
 done
 
-#TODO Add back code to check the tab separated heading and check each line for same number of cells
-
-# Process each input file
-for arg in "$@"; do
+# Search header for key word to differentiate files
+for arg in "$@";do
     header=$(head -1 "$arg")
-    echo "$header" > header_extract.tsv
-    # - check the header for life, gdp and homicide
+    echo "$header" > _header_extract
+
     if echo "$header" | grep -E -q [Ll]ife; then
-    # - ignore rows outside date range and ignore rows without a country code
-    # - sort by entity and delete continent column from life and gdp
-        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life.tsv
-    # - concat entity and year column to create unique column key
-        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _life.tsv | sort -k7 > _tmplife.tsv
+        #TODO How to reuse script in awk?
+        #awk -f scrub_date_row.awk "$arg" 
+        #| sort -k1,1 -k3,3n | cut -f1-6 > _life
+        # exclude date outside range and rows with country code data
+        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life
+        #create the combination key of country code and year
+        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _life | sort -t $'\t' -k9 > _tmplife
+
     elif echo "$header" | grep -E -q [Gg][Dd][Pp]; then
-    # - ignore rows outside date range and ignore rows without a country code
-    # - sort by entity and delete continent column from life and gdp
-        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp.tsv
-        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _gdp.tsv | sort -k7 > _tmpgdp.tsv
+        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp
+        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _gdp | sort -t $'\t' -k9 > _tmpgdp
+
     elif echo "$header" | grep -q [Hh]omicide; then
-    # - ignore rows outside date range and ignore rows without a country code
-        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide.tsv
-    # - concat entity and year column to create unique column key
-        awk 'BEGIN {FS="\t"; OFS=FS} {print $5=$2$3}' _homicide.tsv | sort -k5 > _tmphomicide.tsv
+        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide
+        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _homicide | sort -t $'\t' -k9 > _tmphomicide
     fi
 done
-#TODO remove header_extract.tsv
-#TODO remove temp files
 
-#join -1 7 -2 7 -o 1.1 1.2 1.3 1.4 1.5 1.6 2.5 2.6 _tmplife.tsv _tmpgdp.tsv > merged1.tsv
-#join -1 7 -2 5 -o 1.1 1.2 1.3 1.4 1.5 1.6 2.4 _tmplife.tsv _tmphomicide.tsv > merged2.tsv
-#join -1 7 -2 7 -o 1.1 1.2 1.3 1.7 1.8 2.7 1.5 1.6 merged1.tsv merged2.tsv > merged.tsv
+#TODO Why is DNK2011 not eliminated by -u?
 
-#join -1 7 -2 7 -o 1.1 1.2 1.3 1.4 1.5 1.6 2.1 2.2 2.3 2.4 2.5 2.6 _tmplife.tsv _tmpgdp.tsv > merged1.tsv 
-#join -1 7 -2 5 -o 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 1.10 1.11 1.12 2.1 2.2 2.3 2.4 _tmplife.tsv _tmphomicide.tsv > merged2.tsv 
-#join -1 1 -2 1 -o 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 1.10 1.11 1.12 2.1 2.2 2.3 2.4 merged1.tsv merged2.tsv > merged.tsv
+# Extract combo key from each file to capture all possible available data
+cut -f9 _tmplife | awk '{print $0}' | sort -u -k1 > _cutLife
+cut -f9 _tmpgdp |  awk '{print $0}' | sort -u -k1 > _cutGdp
+cut -f9 _tmphomicide |  awk '{print $0}' | sort -k1  > _cutHomi 
+
+#GOOD
+#https://alexharv074.github.io/2018/09/22/the-four-sql-joins-using-linux-join-and-sort.html
+
+# join the combo key columns from each file into a single source
+join -a 1 -a 2 -t $'\t' -1 1 -2 1 -o 0,1.1,2.1 _cutGdp _cutHomi > _tmpCut
+join -a 1 -a 2 -t $'\t' -1 1 -2 1 -o 0,1.1,2.1 _tmpCut _cutLife | cut -f1 | sort -u -k1> _tmpAll
+
+# use the combined combo key to filter the required columns and rows from each file
+# append the common merged column column 1 of the new file
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 0,2.1,2.2,2.3,2.5,2.6,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmpgdp > _gdpDone
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 0,2.1,2.2,2.3,2.4,1.1,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmphomicide > _homicideDone
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 9 -o 0,2.1,2.2,2.3,2.4,2.5,1.1,1.1,1.1,2.9,1.1 _tmpAll _tmplife > _lifeDone
+
+# join the filtered files with each other on the combo key in the first column
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 1 -o 0,1.2,1.3,1.4,1.5,1.6,2.5,1.1,1.1,1.1 _gdpDone _homicideDone > _clean1
+
+# create header file
+awk 'BEGIN {FS="\t"; OFS=FS; print "Entity","Code", "Year", "GDP per capita, PPP (constant 2017 international $)", "Population (historical estimates)", "Homicide rate per 100,000 population - Both sexes - All ages", "Life expectancy - Sex: all - Age: at birth - Variant: estimates", "Cantril ladder score", "prevMergeComboKey", "comboKey" > "_cleanDone"}'
+
+# final join adding the merged column as the last column
+join -a 1 -a 2 -e '' -t $'\t' -1 1 -2 1 -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,1.1,0 _clean1 _lifeDone  | cut -f1-8 >> _cleanDone
+
+# remove rows that do not have at least three indicators 
+
+#TODO REMOVE TEMP FILES
 
 
+#https://stackoverflow.com/questions/48411579/full-outer-join-on-both-files-by-keeping-certain-columns-in-both-the-files-intac
+#(join -a1 -a2 -e NULL -o '1.1 1.2 1.3 1.4 1.5 1.6 2.5 2.6' file1 file2; join -a1 -a2 -e NULL -o '2.1 2.2 2.3 2.4 1.5 1.6 2.5 2.6' file1 file2 )| grep -v '^NULL' | sort -k 1,2 | uniq
 
+# EXCESS CODE FOR REFERENCE
+# Process each input file
+#for arg in "$@"; do
+#    header=$(head -1 "$arg")
+#    echo "$header" > header_extract.tsv
+#    # - check the header for life, gdp and homicide
+#    if echo "$header" | grep -E -q [Ll]ife; then
+#    # - ignore rows outside date range and ignore rows without a country code
+#    # - sort by entity and delete continent column from life and gdp
+#        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life.tsv
+#    # - concat entity and year column to create unique column key
+#        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _life.tsv | sort -k7 > _tmplife.tsv
+#    elif echo "$header" | grep -E -q [Gg][Dd][Pp]; then
+#    # - ignore rows outside date range and ignore rows without a country code
+#    # - sort by entity and delete continent column from life and gdp
+#        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp.tsv
+#        awk 'BEGIN {FS="\t"; OFS=FS} {$7=$2$3}1' _gdp.tsv | sort -k7 > _tmpgdp.tsv
+#   elif echo "$header" | grep -q [Hh]omicide; then
+#    # - ignore rows outside date range and ignore rows without a country code
+#        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide.tsv
+#    # - concat entity and year column to create unique column key
+#        awk 'BEGIN {FS="\t"; OFS=FS} {print $5=$2$3}' _homicide.tsv | sort -k5 > _tmphomicide.tsv
+#    fi
+#done
 
 
 

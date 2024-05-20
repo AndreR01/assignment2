@@ -14,13 +14,14 @@ if [[ ! -s $arg ]]; then
 	fi
 done
 
+
 # check there's sufficient data in the rows
 # check there are at least three values in the list/array
 
 # account for the 0's - especially in homicide
 
 # Delete the header
-awk -F'\t' 'BEGIN {OFS=FS} $2 == "" || $8 == "" {next} {print $0}' $1 > _tmpCleanRow
+awk -F'\t' 'BEGIN {OFS=FS} ($4 == "" || $5 == "" || $6 == "" || $7 == "") || $8 == "" {next;} {print $0}' $1 > _tmpCleanRow.tsv
 cut -f2-3 _tmpCleanRow | awk 'BEGIN {FS="\t"; OFS=FS} {$4=$1$2}1' | tail -n +2 > _tmpCodeYear
 cut -f1 _tmpCodeYear | sort -u -k1 > _tmpCode
 

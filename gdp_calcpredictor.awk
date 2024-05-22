@@ -37,7 +37,9 @@ END{
         dxy=0
         #TODO What if px or py is 0
         # Excludes some countries for the calculation??
-        if (px < 0 && py < 0) {
+        if (px == 0 || py == 0){    
+        }
+        else if (px < 0 && py < 0) {
             dxy=(sqrt(px * -1) * sqrt(py * -1))
             correlation=( c * sxy - sx * sy ) / dxy
         }
@@ -51,12 +53,14 @@ END{
         }
         else {
         correlation=( c * sxy - sx * sy ) / ((sqrt(c * sx2 - sx * sx) * sqrt(c * sy2 - sy * sy)));
-        printf ("%s\t%d\t Correlation is:\t %.16f\n"), d,c,correlation
+#       printf ("%s\t%d\t Correlation is:\t %.16f\n"), d,c,correlation
         #TODO is there a danger in running totals?
+        sum+=1
         total+=c
-        sum_corr+=correlation
-        mean=sum_corr/total
-    }
+	    sum_corr+=correlation
+	    mean=sum_corr/sum
+        }
 }
-printf ("Total count: %d\t Sum of corrs: %.16f\t GDP mean: %.16f\n"), total, sum_corr, mean
+#printf ("Sum: %d\t Total count: %d\t Sum of corrs: %.16f\t  Life mean: %.3f\n"), sum, total, sum_corr, mean
+print mean
 }

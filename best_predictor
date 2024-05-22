@@ -45,4 +45,10 @@ awk -f popltn_calcpredictor.awk _tmp_predictorData > _check_popltnCalc
 awk -f h_calcpredictor.awk _tmp_predictorData > _check_homicideCalc
 awk -f life_calcpredictor.awk _tmp_predictorData > _check_lifeCalc
 
+gpd_mean=$(cat _check_gdpCalc)
+echo $gdp_mean
+
+
 #TODO REMOVE TEMP FILES
+# clean up temp files
+#rm ./_*

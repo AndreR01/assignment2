@@ -37,7 +37,7 @@ done
 # best predictor of Cantril-ladder life-satisfaction scores
 for arg in "$@"; do
     num_col=$(head -n1 $arg | awk -F'\t' '{print NF;exit}')
-    awk -v cols=$num_col '{if (NF != cols) {printf"Compared to the header line, LINE %d is missing missing cells \n", NR}}' $arg > /dev/stderr
+    awk -v cols=$num_col '{if (NF != cols) {printf"Compared to the header, LINE %d is missing missing cells \n", NR}}' $arg > /dev/stderr
 done
 
 # Search header for key word to differentiate files
@@ -45,24 +45,30 @@ for arg in "$@"; do
     header=$(head -1 "$arg")
     if echo "$header" | grep -E -q [Ll]ife; then
         #TODO How to reuse script in awk?
-        awk -f scrub_date_row.awk "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life
-        # exclude date outside range and rows with country code data
-        #awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life
-
-        #TODO add a n column  to file
-        #https://stackoverflow.com/questions/7551991/add-a-new-column-to-the-file
+        tail -n +2 $arg |cut -f1-6 | awk -f scrub_date_row.awk | sort -k1,1 -k3,3n > _life
+        awk -f rows.awk _life | sort -t $'\t' -k9 > _tmplife
         
 
+        #exclude date outside range and rows with country code data
+        #awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _life
         #create the combination key of country code and year
-        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _life | sort -t $'\t' -k9 > _tmplife
+        #awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _life | sort -t $'\t' -k9 > _tmplife
 
     elif echo "$header" | grep -E -q [Gg][Dd][Pp]; then
-        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp
-        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _gdp | sort -t $'\t' -k9 > _tmpgdp
+        tail -n +2 $arg |cut -f1-6 | awk -f scrub_date_row.awk | sort -k1,1 -k3,3n > _gdp
+        awk -f rows.awk _gdp | sort -t $'\t' -k9 > _tmpgdp
+
+
+        #awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-6 > _gdp
+        #awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _gdp | sort -t $'\t' -k9 > _tmpgdp
 
     elif echo "$header" | grep -q [Hh]omicide; then
-        awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide
-        awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _homicide | sort -t $'\t' -k9 > _tmphomicide
+           tail -n +2 $arg |cut -f1-6 | awk -f scrub_date_row.awk | sort -k1,1 -k3,3n > _homicide
+           awk -f rows.awk _homicide | sort -t $'\t' -k9 > _tmphomicide
+
+
+        #awk -F'\t' 'BEGIN {OFS=FS} (int($3) < 2011 || int($3) > 2021) || $2 == "" {next} {print $0}' "$arg" | sort -k1,1 -k3,3n | cut -f1-4 > _homicide
+        #awk 'BEGIN {FS="\t"; OFS=FS} {$9=$2$3}1' _homicide | sort -t $'\t' -k9 > _tmphomicide
     fi
 done
 
@@ -97,9 +103,7 @@ awk 'BEGIN {FS="\t"; OFS=FS; print "Entity","Code", "Year", "GDP per capita, PPP
 awk -F'\t' 'BEGIN {OFS=FS} $4 == "" && $5 == "" && $6 == "" && $7 == "" && $8 == "" {next;} {print $0}' _cantril_data_blanks >> _cantril_data_done 
 
 #TODO enable cat cmd
-#cat _cantril_data_done
-
- 
+cat _cantril_data_done
 
 # clean up temp files
 rm ./_*

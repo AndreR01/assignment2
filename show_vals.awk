@@ -1,4 +1,4 @@
-#!usr/bin/env awk
+#!usb/bin/env awk
 # Author: Andre Rampono
 # Student: 23840638
 
@@ -12,16 +12,13 @@
 #   STDERR: 
 ### FUNCTION END
 
-BEGIN{
-FS="\t";
-OFS=FS
+BEGIN {
+FS="\t"
 }
 {
-    $9 = $8 ($2$3)
-}
-{
-    if ($3>2010 && $3<2022){print;}
-}
-
-#END{  
-#}
+    calc[$2][0]+=1;
+    calc[$2][1]+= -v $7;
+    calc[$2][2]+= -v $8;
+    calc[$2][3]+= -v ($7*$8);
+    calc[$2][4]+= -v ($7*$7);
+    calc[$2][5]+= -v ($8*$8); 

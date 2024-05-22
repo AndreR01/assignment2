@@ -21,7 +21,7 @@ FS="\t"
     calc[$2][2]+= -v $8;
     calc[$2][3]+= -v ($6*$8);
     calc[$2][4]+= -v ($6*$6);
-    calc[$2][5]+= -v ($8*$8);  
+    calc[$2][5]+= -v ($8*$8); 
 }
 END{
     for (d in calc){
@@ -36,7 +36,7 @@ END{
         dxy=0
         #TODO What if px or py is 0
         # Excludes some countries for the calculation??
-        if (px == 0 || py == 0) {
+        if (px == 0 || py == 0){
             }
             else if (px < 0 && py < 0) {
                 dxy=(sqrt(px * -1) * sqrt(py * -1))
@@ -52,11 +52,13 @@ END{
             }
             else {
                 correlation=( c * sxy - sx * sy ) / ((sqrt(c * sx2 - sx * sx) * sqrt(c * sy2 - sy * sy)));
-            printf ("%s\t%d\t Correlation is:\t %.16f\n"), d,c,correlation
-	    total+=c
+#            printf ("%s\t%d\t Correlation is:\t %.16f\n"), d,c,correlation
+	    sum+=1
+        total+=c
 	    sum_corr+=correlation
-	    mean=sum_corr/total
+	    mean=sum_corr/sum
         }
 }
-printf ("Total count: %d\t Sum of corrs: %.16f\t  Homicide mean: %.16f\n"), total, sum_corr, mean
+#printf ("Sum: %d\t Total count: %d\t Sum of corrs: %.16f\t  Life mean: %.3f\n"), sum, total, sum_corr, mean
+print mean
 }

@@ -18,13 +18,13 @@
 ### FUNCTION END
 
 
-# Check CLI for valid number of arguments
+# check CLI for valid number of arguments
 if [[ $# -ne 1 ]]; then
 	echo "Usage: $0 <tsv datafile> <tsv datafile> <tsv datafile>." > /dev/stderr
 	exit 1
 fi
 
-# Check the file contains data
+# check the file contains data
 for arg in "$@"; do
 if [[ ! -s $arg ]]; then
 	echo "Error: The file $arg does not exist or is not readable." > /dev/stderr
@@ -32,22 +32,19 @@ if [[ ! -s $arg ]]; then
 	fi
 done
 
-# delete header. causes issue with data processing
-# delete blank lines - 
+# delete header. causes issue with data processing 
 tail -n +2 $1 | grep -v '^[[:space:]]*$' > _tmp_noHeader 
 
-# Delete the header
+# delete blank lines
 awk -F'\t' 'BEGIN {OFS=FS} ($4 == "" || $5 == "" || $6 == "" || $7 == "") || $8 == "" {next;} {print $0}' _tmp_noHeader > _tmp_predictorData
 
 # generate standard deviation calculation for each predictor
-awk -f gdp_calcpredictor.awk _tmp_predictorData > _check_gdpCalc
-awk -f popltn_calcpredictor.awk _tmp_predictorData > _check_popltnCalc
-awk -f h_calcpredictor.awk _tmp_predictorData > _check_homicideCalc
-awk -f life_calcpredictor.awk _tmp_predictorData > _check_lifeCalc
+awk -f gdp_calcpredictor.awk _tmp_predictorData > _check_allCalc
+awk -f popltn_calcpredictor.awk _tmp_predictorData >> _check_allCalc
+awk -f h_calcpredictor.awk _tmp_predictorData >> _check_allCalc
+awk -f life_calcpredictor.awk _tmp_predictorData >> _check_allCalc
 
-gpd_mean=$(cat _check_gdpCalc)
-echo $gdp_mean
-
+awk -f all_calcpredictor.awk _check_allCalc
 
 #TODO REMOVE TEMP FILES
 # clean up temp files

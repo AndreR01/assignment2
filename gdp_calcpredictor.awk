@@ -61,6 +61,5 @@ END{
 	    mean=sum_corr/sum
         }
 }
-#printf ("Sum: %d\t Total count: %d\t Sum of corrs: %.16f\t  Life mean: %.3f\n"), sum, total, sum_corr, mean
-print mean
+printf ("GDP\t %.3f\n"), mean
 }

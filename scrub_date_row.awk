@@ -3,13 +3,15 @@
 # Student: 23840638
 
 #### FUNCTION BEGINS
-# Takes the filtered data of countries, and outputs a file containing the correlation of each predictor against the cantril ladder score
+# Excludes rows of data that fall outside the required date range
+# Creates a key in Column 9 to for seartch filtering purposes
 # 
 # ARGUMENTS:
 #   $1: tsv data file
 # OUTPUTS
-#   FILE: for each country with vailid data, a row the country, number data points used and the correlation to the country's cantril ladder score  
-#   STDERR: 
+#   FILE:
+#   STDERR:
+#   RETURNS: 
 ### FUNCTION END
 
 BEGIN{
@@ -23,5 +25,3 @@ OFS=FS
     if ($3>2010 && $3<2022){print;}
 }
 
-#END{  
-#}

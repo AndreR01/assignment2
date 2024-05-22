@@ -3,20 +3,17 @@
 # Student: 23840638
 
 #### FUNCTION BEGINS
-# Given three tsv data files, clean each file for a date range (2011-2021),
-# remove the Continent column from GDP and Life files as well as rows
-# that do not contain a Code for the associated Entity column
-# Format of results depends on $2 input
+# Top level script
+# From the given data file, calculates the mean correlation between predictors and the Cantril ladder score.
+# Outputs the mean scores and as well the mean score with the greatest absolute value.
 # ARGUMENTS:
 #   $1: tsv data file
-#   $2: tsv data file
-#   $3: tsv data file
 # OUTPUTS
-#   STDOUT: the cleaned data of the three input files combined from selected columns
-#           to derive the best predictor of Cantril-ladder life-satisfaction scores.
-#   STDERR: All errors
+#   STDOUT: mean correlation for each predictor
+#           predictor with greatest absolute value
+#   STDERR:
+#   RETURNS:
 ### FUNCTION END
-
 
 # check CLI for valid number of arguments
 if [[ $# -ne 1 ]]; then
@@ -46,6 +43,5 @@ awk -f life_calcpredictor.awk _tmp_predictorData >> _check_allCalc
 
 awk -f all_calcpredictor.awk _check_allCalc
 
-#TODO REMOVE TEMP FILES
 # clean up temp files
-#rm ./_*
+rm ./_*

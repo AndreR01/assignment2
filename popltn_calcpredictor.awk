@@ -1,15 +1,16 @@
-#!usb/bin/env awk
+#!usr/bin/env awk
 # Author: Andre Rampono
 # Student: 23840638
 
 #### FUNCTION BEGINS
-# Takes the filtered data of countries, and outputs a file containing the correlation of each predictor against the cantril ladder score
+# Calculates the mean correlation of population predictore across all valid data
 # 
 # ARGUMENTS:
 #   $1: tsv data file
 # OUTPUTS
-#   FILE: for each country with vailid data, a row the country, number data points used and the correlation to the country's cantril ladder score  
-#   STDERR: 
+#   FILE:
+#   STDERR:
+#   RETURNS: 
 ### FUNCTION END
 
 BEGIN {
@@ -34,8 +35,6 @@ END{
         px=(c*sx2 - sx*sx)
         py=(c*sy2 - sy*sy)
         dxy=0
-        #TODO What if px or py is 0
-        # Excludes some countries for the calculation??
         if (px == 0 || py == 0){
             }
             else if (px < 0 && py < 0) {
@@ -52,13 +51,11 @@ END{
             }
             else {
                 correlation=( c * sxy - sx * sy ) / ((sqrt(c * sx2 - sx * sx) * sqrt(c * sy2 - sy * sy)));
-#            printf ("%s\t%d\t Correlation is:\t %.16f\n"), d,c,correlation
 	    sum+=1
         total+=c
 	    sum_corr+=correlation
 	    mean=sum_corr/sum
         }
 }
-#printf ("Sum: %d\t Total count: %d\t Sum of corrs: %.16f\t  Life mean: %.3f\n"), sum, total, sum_corr, mean
 printf("Population\t %.3f\n"), mean
 }
